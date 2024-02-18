@@ -1,0 +1,62 @@
+{% extends "carpark/base.html" %}
+{% load crispy_forms_tags %}
+{% block content%}
+	<div class="content-section">
+		<div class="media">
+			<img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
+		<div class="media-body">
+		  <h2 class="account-heading">{{user.username}}</h2>
+		  <p class="text-secondary">Your vehicle is currently: {{user.profile.parked|yesno:"Parked, Not Parked"}}</p>
+		  <p class="text-secondary">Registration Number: {{user.profile.reg}}</p>
+		</div>
+		</div>
+	  	<form method="POST" enctype="multipart/form-data">
+			{% csrf_token %}
+			<fieldset class="form-group">
+				<legend class="border-bottom mb-4">Profile Info</legend>
+				{{ u_form|crispy }}
+				{{ p_form|crispy }}
+			</fieldset>
+			<div class="form-group">
+				<button class="btn btn-outline-info" type="submit">Update</button>
+			</div>
+		</form>
+
+		<h2>Parking History</h2>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Elapsed Time</th>
+					<th>Amount</th>
+					<th>Date</th>
+					<th>Status</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for parking in user.parkings.all reversed %}
+				{% if parking.paid == False %}
+				<tr>
+					<td>{{ parking.id }}</td>
+					<td>{{ parking.elapsed_time }}</td>
+					<td>£{{ parking.amount|floatformat:2 }}</td>
+					<td>{{ parking.created }}</td>
+					<td><a class="btn btn-outline-secondary" href="#" >{{ parking.paid|yesno:"Paid, Pay" }}</a></td>
+
+				</tr>
+				{% else %}
+				<tr>
+					<td>{{ parking.id }}</td>
+					<td>{{ parking.elapsed_time }}</td>
+					<td>£{{ parking.amount|floatformat:2 }}</td>
+					<td>{{ parking.created }}</td>
+					<td>{{ parking.paid|yesno:"Paid, Paid" }}</td>Paid</a>
+
+				</tr>
+				{% endif %}
+				{% endfor %}
+
+			</tbody>
+		</table>
+	</div>
+{% endblock content %}
